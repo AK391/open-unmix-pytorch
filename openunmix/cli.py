@@ -3,7 +3,7 @@ import torch
 import torchaudio
 import json
 import numpy as np
-
+import tqdm
 
 from openunmix import utils
 from openunmix import predict
@@ -23,9 +23,9 @@ def separate():
 
     parser.add_argument(
         "--model",
-        default="umxhq",
+        default="umxl",
         type=str,
-        help="path to mode base directory of pretrained models, defaults to UMX-HQ",
+        help="path to mode base directory of pretrained models, defaults to UMX-L",
     )
 
     parser.add_argument(
@@ -64,9 +64,8 @@ def separate():
     parser.add_argument(
         "--audio-backend",
         type=str,
-        default="sox_io",
-        help="Set torchaudio backend "
-        "(`sox_io`, `sox`, `soundfile` or `stempeg`), defaults to `sox_io`",
+        help="Sets audio backend. Default to torchaudio's default backend: See https://pytorch.org/audio/stable/backend.html"
+        "(`sox_io`, `sox`, `soundfile` or `stempeg`)",
     )
 
     parser.add_argument(
@@ -112,14 +111,21 @@ def separate():
         "asteroids stft can be exported to onnx, which makes is practical"
         "for deployment.",
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Enable log messages",
+    )
     args = parser.parse_args()
 
-    if args.audio_backend != "stempeg":
+    if args.audio_backend != "stempeg" and args.audio_backend is not None:
         torchaudio.set_audio_backend(args.audio_backend)
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
-    print("Using ", device)
+    if args.verbose:
+        print("Using ", device)
     # parsing the output dict
     aggregate_dict = None if args.aggregate is None else json.loads(args.aggregate)
 
@@ -146,7 +152,7 @@ def separate():
             raise RuntimeError("Please install pip package `stempeg`")
 
     # loop over the files
-    for input_file in args.input:
+    for input_file in tqdm.tqdm(args.input):
         if args.audio_backend == "stempeg":
             audio, rate = stempeg.read_stems(
                 input_file,

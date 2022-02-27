@@ -4,7 +4,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1mijF0zGWxN-KaxTnd0q6hayAlrID5fEQ)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/open-unmix-a-reference-implementation-for/music-source-separation-on-musdb18)](https://paperswithcode.com/sota/music-source-separation-on-musdb18?p=open-unmix-a-reference-implementation-for)
 
-[![Build Status](https://github.com/sigsep/open-unmix-pytorch/workflows/CI/badge.svg)](https://github.com/faroit/stempeg/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
+[![Build Status](https://github.com/sigsep/open-unmix-pytorch/workflows/CI/badge.svg)](https://github.com/sigsep/open-unmix-pytorch/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
 [![Latest Version](https://img.shields.io/pypi/v/openunmix.svg)](https://pypi.python.org/pypi/openunmix)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/openunmix.svg)](https://pypi.python.org/pypi/openunmix)
 
@@ -76,18 +76,18 @@ Training is not part of the open-unmix package, please follow [docs/train.md] fo
 We also provide a docker container. Performing separation of a local track in `~/Music/track1.wav` can be performed in a single line:
 
 ```
-docker run -v ~/Music/:/data -it faroit/open-unmix-pytorch umx "/data/track1.wav" --outdir /data/track1
+docker run -v ~/Music/:/data -it faroit/open-unmix-pytorch "/data/track1.wav" --outdir /data/track1
 ```
 
 ### Pre-trained models
 
 We provide three core pre-trained music separation models. All three models are end-to-end models that take waveform inputs and output the separated waveforms.
 
-* __`umxl`__  trained on private stems dataset of compressed stems. __Note, that the weights are only licensed for non-commercial use (CC BY-NC-SA 4.0).__
+* __`umxl` (default)__  trained on private stems dataset of compressed stems. __Note, that the weights are only licensed for non-commercial use (CC BY-NC-SA 4.0).__
 
   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5069601.svg)](https://doi.org/10.5281/zenodo.5069601)
 
-* __`umxhq` (default)__  trained on [MUSDB18-HQ](https://sigsep.github.io/datasets/musdb.html#uncompressed-wav) which comprises the same tracks as in MUSDB18 but un-compressed which yield in a full bandwidth of 22050 Hz.
+* __`umxhq`__  trained on [MUSDB18-HQ](https://sigsep.github.io/datasets/musdb.html#uncompressed-wav) which comprises the same tracks as in MUSDB18 but un-compressed which yield in a full bandwidth of 22050 Hz.
 
   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3370489.svg)](https://doi.org/10.5281/zenodo.3370489)
 
@@ -107,7 +107,7 @@ These models can be loaded using `umxl_spec`, `umxhq_spec`, `umx_spec` and `umxs
 To separate audio files (`wav`, `flac`, `ogg` - but not `mp3`) files just run:
 
 ```bash
-umx input_file.wav --model umxl
+umx input_file.wav
 ```
 
 A more detailed list of the parameters used for the separation is given in the [inference.md](/docs/inference.md) document.
@@ -122,17 +122,17 @@ We implementes several ways to load pre-trained models and use them from within 
 Loading a pre-trained models is as simple as loading
 
 ```python
-separator = openunmix.umxhq(...)
+separator = openunmix.umxl(...)
 ```
 #### torch.hub
 
 We also provide a torch.hub compatible modules that can be loaded. Note that this does _not_ even require to install the open-unmix packagen and should generally work when the pytorch version is the same.
 
 ```python
-separator = torch.hub.load('sigsep/open-unmix-pytorch', 'umxhq', device=device)
+separator = torch.hub.load('sigsep/open-unmix-pytorch', 'umxl, device=device)
 ```
 
-Where, `umxhq` specifies the pre-trained model. 
+Where, `umxl` specifies the pre-trained model. 
 #### Performing separation
 
 With a created separator object, one can perform separation of some `audio` (torch.Tensor of shape `(channels, length)`, provided as at a sampling rate `separator.sample_rate`) through:

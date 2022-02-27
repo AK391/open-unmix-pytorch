@@ -44,7 +44,7 @@ Some of the parameters for the MUSDB sampling can be controlled using the follow
 |---------------------|-----------------------------------------------|--------------|
 | `--is-wav`          | loads the decoded WAVs instead of STEMS for faster data loading. See [more details here](https://github.com/sigsep/sigsep-mus-db#using-wav-files-optional). | `True`      |
 | `--samples-per-track <int>` | sets the number of samples that are randomly drawn from each track  | `64`       |
-| `--source-augmentations <list[str]>` | applies augmentations to each audio source before mixing, available augmentations: `[gain, channelswap]`| no augmentations       |
+| `--source-augmentations <list[str]>` | applies augmentations to each audio source before mixing, available augmentations: `[gain, channelswap]`| [gain, channelswap]       |
 
 ## Training and Model Parameters
 
@@ -54,7 +54,8 @@ An extensive list of additional training parameters allows researchers to quickl
 |----------------------------|---------------------------------------------------------------------------------|-----------------|
 | `--target <str>`           | name of target source (will be passed to the dataset)                         | `vocals`      |
 | `--output <str>`           | path where to save the trained output model as well as checkpoints.                         | `./open-unmix`      |
-| `--model <str>`           | path to checkpoint of target model to resume training. | not set      |
+| `--checkpoint <str>`           | path to checkpoint of target model to resume training. | not set      |
+| `--model <str>`           | path or str to pretrained target to fine-tune model | not set      |
 | `--no_cuda`           | disable cuda even if available                                              | not set      |
 | `--epochs <int>`           | Number of epochs to train                                                       | `1000`          |
 | `--batch-size <int>`       | Batch size has influence on memory usage and performance of the LSTM layer      | `16`            |

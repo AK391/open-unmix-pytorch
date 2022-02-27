@@ -69,12 +69,19 @@ class TorchSTFT(nn.Module):
         window (nn.Parameter, optional): window function
     """
 
-    def __init__(self, n_fft=4096, n_hop=1024, center=False, window=None):
+    def __init__(
+        self,
+        n_fft: int = 4096,
+        n_hop: int = 1024,
+        center: bool = False,
+        window: Optional[nn.Parameter] = None,
+    ):
         super(TorchSTFT, self).__init__()
-        if window is not None:
+        if window is None:
             self.window = nn.Parameter(torch.hann_window(n_fft), requires_grad=False)
         else:
             self.window = window
+
         self.n_fft = n_fft
         self.n_hop = n_hop
         self.center = center
@@ -149,7 +156,7 @@ class TorchISTFT(nn.Module):
         self.center = center
         self.sample_rate = sample_rate
 
-        if window is not None:
+        if window is None:
             self.window = nn.Parameter(torch.hann_window(n_fft), requires_grad=False)
         else:
             self.window = window
@@ -180,14 +187,12 @@ class ComplexNorm(nn.Module):
     Extension of `torchaudio.functional.complex_norm` with mono
 
     Args:
-        power (float): Power of the norm. (Default: `1.0`).
         mono (bool): Downmix to single channel after applying power norm
             to maximize
     """
 
-    def __init__(self, power: float = 1.0, mono: bool = False):
+    def __init__(self, mono: bool = False):
         super(ComplexNorm, self).__init__()
-        self.power = power
         self.mono = mono
 
     def forward(self, spec: Tensor) -> Tensor:
@@ -201,7 +206,8 @@ class ComplexNorm(nn.Module):
                 `(...,)`
         """
         # take the magnitude
-        spec = torchaudio.functional.complex_norm(spec, power=self.power)
+
+        spec = torch.abs(torch.view_as_complex(spec))
 
         # downmix in the mag domain to preserve energy
         if self.mono:
